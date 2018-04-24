@@ -1,9 +1,12 @@
 package com.helospark.lightdi.test.junit4;
 
 import static com.helospark.lightdi.util.BeanNameGenerator.createBeanNameForStereotypeAnnotatedClass;
+import static java.util.Arrays.asList;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import org.junit.runners.BlockJUnit4ClassRunner;
@@ -18,6 +21,7 @@ import com.helospark.lightdi.test.annotation.MockBean;
 import com.helospark.lightdi.test.annotation.SpyBean;
 import com.helospark.lightdi.util.AnnotationUtil;
 import com.helospark.lightdi.util.AutowirePostProcessor;
+import com.helospark.lightdi.util.LightDiAnnotation;
 import com.helospark.lightdi.util.ReflectionUtil;
 
 public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
@@ -32,12 +36,20 @@ public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
     @Override
     protected Object createTest() throws Exception {
         Object result = super.createTest();
-        LightDiTest packageName = extractAnnotationFromClass(clazz);
+        LightDiAnnotation annotation = extractAnnotationFromClass(clazz);
         context = new LightDiContext();
 
         preinitializeMocks(result);
 
-        context.loadDependenciesFromPackageUsingFullClasspathScan(packageName.rootPackage());
+        String[] packages = annotation.getAttributeAs(LightDiTest.ROOT_PACKAGE_ATTRIBUTE_NAME, String[].class);
+        Class<?>[] classes = annotation.getAttributeAs(LightDiTest.CLASSES_ATTRIBUTE_NAME, Class[].class);
+
+        List<Class<?>> classesToAddToContext = new ArrayList<>();
+        classesToAddToContext.addAll(asList(classes));
+        classesToAddToContext.add(result.getClass());
+
+        context.addDependencies(asList(packages), classesToAddToContext);
+
         AutowirePostProcessor autowireSupportUtil = context.getAutowireSupportUtil();
         autowireSupportUtil.autowireFieldsTo(result);
         return result;
@@ -74,12 +86,7 @@ public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
         ReflectionUtil.injectToField(field, instance, mock);
     }
 
-    private LightDiTest extractAnnotationFromClass(Class<?> clazz) {
-        LightDiTest annotation = AnnotationUtil.getSingleAnnotationOfType(clazz, LightDiTest.class);
-        if (annotation == null) {
-            throw new IllegalStateException(
-                    LightDiJUnitTestRunner.class.getSimpleName() + " is running a test which does not contain @LightDiTest annotation");
-        }
-        return annotation;
+    private LightDiAnnotation extractAnnotationFromClass(Class<?> clazz) {
+        return AnnotationUtil.getSingleAnnotationOfType(clazz, LightDiTest.class);
     }
 }
