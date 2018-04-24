@@ -16,9 +16,26 @@ import com.helospark.lightdi.annotation.PropertySource;
 @PropertySource(value = "ignored")
 @Target(TYPE)
 public @interface TestPropertySource {
-    @AliasFor(annotation = PropertySource.class, value = "value")
-    String[] locations();
+    public static final String PROPERTIES_ATTRIBUTE_NAME = "properties";
 
+    /**
+     * Property override locations.
+     * @return locations either in classpath, or file
+     */
+    @AliasFor(annotation = PropertySource.class, value = "value")
+    String[] locations() default {};
+
+    /**
+     * Order of the property source, by default highest.
+     * @return order
+     */
     @AliasFor(annotation = PropertySource.class, value = "order")
     int order() default HIGHEST_PROPERTY_ORDER;
+
+    /**
+     * Add list of properties to property source.
+     * Note: that due to a limitation in 0.0.2, this only works on the test class
+     * @return list of properties
+     */
+    String[] properties() default {};
 }
