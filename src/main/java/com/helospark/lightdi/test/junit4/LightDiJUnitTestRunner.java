@@ -15,7 +15,9 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.junit.runners.model.FrameworkMethod;
 import org.junit.runners.model.InitializationError;
+import org.junit.runners.model.Statement;
 import org.mockito.Mockito;
 
 import com.helospark.lightdi.LightDiContext;
@@ -62,6 +64,29 @@ public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
         AutowirePostProcessor autowireSupportUtil = context.getAutowireSupportUtil();
         autowireSupportUtil.autowireFieldsTo(result);
         return result;
+    }
+
+    @Override
+    protected Statement methodBlock(FrameworkMethod method) {
+        Statement statement = super.methodBlock(method);
+        statement = thenClearContext(statement);
+        return statement;
+    }
+
+    private Statement thenClearContext(Statement statement) {
+        return new Statement() {
+
+            @Override
+            public void evaluate() throws Throwable {
+                try {
+                    statement.evaluate();
+                } finally {
+                    context.close();
+                    context = null;
+                }
+            }
+
+        };
     }
 
     private void initializeInlineProperties(Class<?> clazz2) {
