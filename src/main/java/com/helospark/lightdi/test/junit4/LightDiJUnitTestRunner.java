@@ -59,7 +59,7 @@ public class LightDiJUnitTestRunner extends BlockJUnit4ClassRunner {
         classesToAddToContext.addAll(asList(classes));
         classesToAddToContext.add(result.getClass());
 
-        context.addDependencies(asList(packages), classesToAddToContext);
+        context.loadDependencies(asList(packages), classesToAddToContext);
 
         AutowirePostProcessor autowireSupportUtil = context.getAutowireSupportUtil();
         autowireSupportUtil.autowireFieldsTo(result);
