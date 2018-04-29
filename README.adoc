@@ -1,0 +1,66 @@
+image:https://travis-ci.org/helospark/lightdi-test.svg?branch=master["Build Status", link="https://travis-ci.org/helospark/lightdi-test"]
+image:https://img.shields.io/codecov/c/github/helospark/lightdi-test.svg["Coverage", link="https://codecov.io/gh/helospark/lightdi-test"]
+image:https://img.shields.io/github/license/helospark/lightdi-test.svg["MIT licence", link="https://github.com/helospark/lightdi-test/blob/master/LICENSE"]
+image:https://img.shields.io/badge/PRs-welcome-brightgreen.svg["PRs Welcome", link="http://makeapullrequest.com"]
+
+= LightDI Test
+
+*Testing support for the LightDI framework*
+
+Designed to make writing integration test easier for LightDI.
+
+== Features
+
+* Creating and injecting mock beans into the application context using @MockBean and @SpyBean
+* Creating property overrides using @TestPropertySource
+* Supporting @Autowire to the JUnit test class
+
+== Usage
+
+=== Include library
+
+Include the jar file in your project.
+You can do this using Maven:
+
+[source,xml]
+     <dependency>
+      <groupId>com.helospark</groupId>
+      <artifactId>lightdi-test</artifactId>
+      <version>${lightdi-test.version}</version>
+     </dependency>
+
+(Check mvnrepository.com for the latest version).
+
+You can also download the single-jar version from Maven central for direct usage:
+
+https://repo1.maven.org/maven2/com/helospark/lightdi-test/0.0.2/lightdi-test-{insert.light.version.here}-jar-with-dependencies.jar
+
+(jar-with-dependencies is a Maven classifier, if you would like to use the fat jar using Maven)
+
+=== Library usage
+
+Annotate beans with above annotations
+
+[source,java]
+	@RunWith(LightDiJUnitTestRunner.class)
+	@LightDiTest(rootPackage = "com.helospark.context") // You can also use class
+	public class JUnitRunnerTest {
+	    @Autowired
+	    private TestDependency testDependency;
+	    @MockBean
+	    private BeanToOverride beanToOverride;
+	    
+	    @Test
+	   public void test() {
+	     //...
+	   }
+	}
+
+== Building and contribution
+
+You can build using Maven:
+
+[source,bash]
+     mvn clean install -DskipGpgSign
+
+Feel free to open issues / pull requests.

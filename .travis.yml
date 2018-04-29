@@ -1,0 +1,6 @@
+language: java
+sudo: false
+install: true
+script: "mvn clean install -DskipGpgSign"
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
