@@ -49,12 +49,11 @@ Annotate beans with above annotations
 	    private TestDependency testDependency;
 	    @MockBean
 	    private BeanToOverride beanToOverride;
-	    
 	    @Test
-	   public void test() {
-	     //...
-	   }
-	}
+	    public void test() {
+	      //...
+	    }
+	 }
 
 == Building and contribution
 
